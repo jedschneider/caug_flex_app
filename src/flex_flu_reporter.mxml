@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark" xmlns:mx="library://ns.adobe.com/flex/halo" minWidth="1024" minHeight="768">
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+	xmlns:s="library://ns.adobe.com/flex/spark" 
+	xmlns:mx="library://ns.adobe.com/flex/halo" 
+	minWidth="1024" minHeight="768"
+	creationComplete="{flu_reports.send()}">
 	<fx:Script>
 		<![CDATA[
 			import mx.rpc.events.ResultEvent;
-			
+			import mx.controls.Alert;
 			private function handleFluReports(event:ResultEvent):void
 			{
-				trace(event.result);
+				var xml:XML = new XML();
+				xml = event.result as XML;
+				Alert.show("There are " + xml.children().length() + " flu reports");
 			}
 		]]>
 	</fx:Script>
@@ -14,7 +20,7 @@
 		<mx:HTTPService 
 			id="flu_reports" 
 			resultFormat="e4x" 
-			url="http://localhost:3000/flu_reports.xml" 
+			url="http://localhost:3000/flu_report.xml" 
 			result="handleFluReports(event)"/>
 	</fx:Declarations>
 </s:Application>
