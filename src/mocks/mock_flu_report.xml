@@ -1,0 +1,10 @@
+ <flu-report>
+    <confirmed type="integer">48159</confirmed>
+    <created-at type="datetime">2009-09-05T12:45:01Z</created-at>
+    <fatal type="integer">314</fatal>
+    <id type="integer">6</id>
+    <report-date type="date">2009-07-27</report-date>
+    <suspected type="integer">1059</suspected>
+    <total-cases type="integer" nil="true"></total-cases>
+    <updated-at type="datetime">2009-09-05T12:45:01Z</updated-at>
+  </flu-report>
