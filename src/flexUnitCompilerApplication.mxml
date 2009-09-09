@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark" xmlns:mx="library://ns.adobe.com/flex/halo" minWidth="1024" minHeight="768">	
+
+<fx:Script>
+	<![CDATA[
+
+			import test.unit.FluReportManagerTest;
+
+			private var test_FluReportManagerTest_obj:test.unit.FluReportManagerTest;
+	]]>
+</fx:Script>	
+<fx:Script>
+	<![CDATA[
+
+			import test.unit.FluReportTest;
+
+			private var test_FluReportTest_obj:test.unit.FluReportTest;
+	]]>
+</fx:Script>
+	
+</s:Application>

@@ -6,14 +6,25 @@
 	creationComplete="{flu_reports.send()}">
 	<fx:Script>
 		<![CDATA[
+			import mx.collections.ArrayCollection;
+			import managers.FluReportManager;
 			import mx.rpc.events.ResultEvent;
 			import mx.controls.Alert;
+			
+			public var fluReportManager:FluReportManager;
+			
+			[Bindable]
+			public var arrayCollection:ArrayCollection;
+			
+			/**
+			 * handles the return of the data service call
+			 */
 			private function handleFluReports(event:ResultEvent):void
 			{
-				var xml:XML = new XML();
-				xml = event.result as XML;
-				Alert.show("There are " + xml.children().length() + " flu reports");
+				fluReportManager = new FluReportManager();
+				arrayCollection = fluReportManager.parseXML(event.result as XML);
 			}
+			
 		]]>
 	</fx:Script>
 	<fx:Declarations>
@@ -23,4 +34,25 @@
 			url="http://localhost:3000/flu_report.xml" 
 			result="handleFluReports(event)"/>
 	</fx:Declarations>
+	
+	<s:Panel >
+		<mx:ColumnChart dataProvider="{arrayCollection}" 
+			id="columnChart" 
+			width="800" 
+			height="600" showDataTips="true">
+			<mx:horizontalAxis>
+				<mx:CategoryAxis id="a1" categoryField="projectDate" displayName="Date"/> 
+			</mx:horizontalAxis>
+			<mx:horizontalAxisRenderers>
+				<mx:AxisRenderer axis="{a1}" showLabels="false"/>
+			</mx:horizontalAxisRenderers>
+			<mx:series>
+					<mx:ColumnSeries yField="confirmed" displayName="Confirmed"/>
+				<mx:ColumnSet type="overlaid">	
+					<mx:ColumnSeries yField="fatal" displayName="Fatal"/>
+					<mx:ColumnSeries yField="suspected" displayName="Suspected"/>
+				</mx:ColumnSet>
+			</mx:series>
+		</mx:ColumnChart>
+	</s:Panel>
 </s:Application>
