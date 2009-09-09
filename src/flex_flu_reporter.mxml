@@ -47,8 +47,8 @@
 				<mx:AxisRenderer axis="{a1}" showLabels="false"/>
 			</mx:horizontalAxisRenderers>
 			<mx:series>
+				<mx:ColumnSet type="clustered">		
 					<mx:ColumnSeries yField="confirmed" displayName="Confirmed"/>
-				<mx:ColumnSet type="overlaid">	
 					<mx:ColumnSeries yField="fatal" displayName="Fatal"/>
 					<mx:ColumnSeries yField="suspected" displayName="Suspected"/>
 				</mx:ColumnSet>
