@@ -3,9 +3,12 @@
 	xmlns:s="library://ns.adobe.com/flex/spark" 
 	xmlns:mx="library://ns.adobe.com/flex/halo" 
 	minWidth="1024" minHeight="768"
-	creationComplete="{flu_reports.send()}">
+	creationComplete="initApp()">
 	<fx:Script>
 		<![CDATA[
+			import flash.utils.flash_proxy;
+			import mx.charts.events.ChartItemEvent;
+			import models.FluReport;
 			import mx.collections.ArrayCollection;
 			import managers.FluReportManager;
 			import mx.rpc.events.ResultEvent;
@@ -14,17 +17,50 @@
 			public var fluReportManager:FluReportManager;
 			
 			[Bindable]
+			public var fluCases:ArrayCollection;
+			
+			[Bindable]
 			public var arrayCollection:ArrayCollection;
 			
 			/**
+			 * called on creation complete
+			 */
+			protected function initApp():void
+			{
+				flu_reports.send();
+			}
+			/**
 			 * handles the return of the data service call
 			 */
-			private function handleFluReports(event:ResultEvent):void
+			protected function handleFluReports(event:ResultEvent):void
 			{
 				fluReportManager = new FluReportManager();
 				arrayCollection = fluReportManager.parseXML(event.result as XML);
 			}
 			
+			/**
+			 * handles the click of an item in the ColumnChart
+			 */
+			protected function clickHandler(event:ChartItemEvent):void
+			{
+				var report:FluReport = event.hitData.item as FluReport;
+				var previousReport:FluReport = fluReportManager.findReportById( report.id - 1 );
+				
+				//newReport defines a difference betwteen the selected report and the one before it
+				var newReport:FluReport = fluReportManager.diffFluReports(report, previousReport);
+				var totalCases:Number = newReport.confirmed + newReport.suspected + newReport.fatal;
+				
+				fluCases = new ArrayCollection();
+				fluCases.addItem( {type:"confirmed", cases: newReport.confirmed } );
+				fluCases.addItem( {type: "suspected", cases: newReport.suspected} );
+				fluCases.addItem( {type: "fatal", cases: newReport.fatal } );
+				
+				textArea.text = "Previous Report: "+ previousReport.projectDate.toLocaleDateString() 
+					+ "\nThis Report: " + report.projectDate.toLocaleDateString()				
+					+ "\nTotal New Cases: " + totalCases
+					+ "\nNew confirmed: " + newReport.confirmed + " " 
+					+ "\nNew suspected: " + newReport.suspected + "\nNew fatal: " + newReport.fatal;
+			}
 		]]>
 	</fx:Script>
 	<fx:Declarations>
@@ -35,11 +71,11 @@
 			result="handleFluReports(event)"/>
 	</fx:Declarations>
 	
-	<s:Panel >
+	<s:Panel title="Swine Flu Cases For The United States in 2009" width="800" height="90%">
 		<mx:ColumnChart dataProvider="{arrayCollection}" 
 			id="columnChart" 
-			width="800" 
-			height="600" showDataTips="true">
+			width="100%" 
+			height="100%" showDataTips="true" itemClick="clickHandler(event)">
 			<mx:horizontalAxis>
 				<mx:CategoryAxis id="a1" categoryField="projectDate" displayName="Date"/> 
 			</mx:horizontalAxis>
@@ -47,12 +83,22 @@
 				<mx:AxisRenderer axis="{a1}" showLabels="false"/>
 			</mx:horizontalAxisRenderers>
 			<mx:series>
-				<mx:ColumnSet type="clustered">		
-					<mx:ColumnSeries yField="confirmed" displayName="Confirmed"/>
+				<mx:ColumnSet type="stacked" >		
+					<mx:ColumnSeries yField="confirmed" displayName="Confirmed" />
 					<mx:ColumnSeries yField="fatal" displayName="Fatal"/>
 					<mx:ColumnSeries yField="suspected" displayName="Suspected"/>
 				</mx:ColumnSet>
 			</mx:series>
 		</mx:ColumnChart>
+	</s:Panel>
+	<s:Panel width="200" height="90%" x="801" title="Report Details">
+		<mx:Label id="detailsLabel" width="190" text="New Cases Since The Last Report" />
+		<mx:PieChart id="pieChart" dataProvider="{fluCases}" innerRadius=".8" width="200" showAllDataTips="true" >
+			<mx:series>
+				<mx:PieSeries field="cases" />
+			</mx:series>
+		</mx:PieChart>
+		<s:TextArea id="textArea" y="300">
+		</s:TextArea>
 	</s:Panel>
 </s:Application>

@@ -5,6 +5,8 @@ package test.unit
 	import managers.FluReportManager;
 	
 	import models.FluReport;
+	
+	import mx.collections.ArrayCollection;
 
 	public class FluReportManagerTest extends TestCase
 	{
@@ -19,7 +21,7 @@ package test.unit
 				"<suspected type=\"integer\">1059</suspected>" + 
 				"<total-cases type=\"integer\" nil=\"true\"></total-cases>" + 
 				"<updated-at type=\"datetime\">2009-09-05T12:45:01Z</updated-at>" + 
-				"</flu-report>";
+				"</flu-report>";		
 		
 		public var mockFluReport:XML;
 		public var fluReport:FluReport;
@@ -76,7 +78,7 @@ package test.unit
 		{
 			assertEquals('confimred values should match', 
 				48159, fluReport.confirmed);
-			var controlDate:Date = new Date(2009, 07, 27);
+			var controlDate:Date = new Date(2009, (07-1), 27);
 			assertEquals('date values should match', 
 				controlDate.valueOf(), fluReport.projectDate.valueOf() );
 			assertEquals('fatal values should match',
@@ -93,12 +95,46 @@ package test.unit
 			var dateString:String = '2009-07-27';
 			var testDate:Date = fluReportManager.stringToDate(dateString);
 			var controlDate:Date = new Date(2009, 07, 27);
+			assertFalse('date values are not equal, month is one off',
+				controlDate.valueOf() == testDate.valueOf() );
+			controlDate = new Date(2009, 06, 27)	
 			assertEquals('date values should be equal',controlDate.valueOf(), testDate.valueOf() );
 		}
 		
-		public function testParseXML():void
+//		public function testParseXML():void
+//		{
+//			fail('not yet implemented');
+//		}
+		
+		public function testFindReportById():void
 		{
-			fail('not yet implemented');
+			var reportString:String = " <reports><flu-report>" + 
+				"<confirmed type=\"\">48159</confirmed>" + 
+				"<created-at type=\"datetime\">2009-09-05T12:45:01Z</created-at>" + 
+				"<fatal type=\"integer\">314</fatal>" + 
+				"<id type=\"integer\">6</id>" + 
+				"<report-date type=\"date\">2009-07-27</report-date>" + 
+				"<suspected type=\"integer\">1059</suspected>" + 
+				"<total-cases type=\"integer\" nil=\"true\"></total-cases>" + 
+				"<updated-at type=\"datetime\">2009-09-05T12:45:01Z</updated-at>" + 
+				"</flu-report>" +
+				" <flu-report>" + 
+				"<confirmed type=\"\">48159</confirmed>" + 
+				"<created-at type=\"datetime\">2009-09-05T12:45:01Z</created-at>" + 
+				"<fatal type=\"integer\">314</fatal>" + 
+				"<id type=\"integer\">7</id>" + 
+				"<report-date type=\"date\">2009-07-27</report-date>" + 
+				"<suspected type=\"integer\">1059</suspected>" + 
+				"<total-cases type=\"integer\" nil=\"true\"></total-cases>" + 
+				"<updated-at type=\"datetime\">2009-09-05T12:45:01Z</updated-at>" + 
+				"</flu-report></reports>";	
+			mockFluReport = new XML(reportString);
+			assertEquals(2, mockFluReport.children().length());
+			var ac:ArrayCollection = fluReportManager.parseXML(mockFluReport);
+			var report:FluReport = fluReportManager.findReportById(6);
+			assertEquals('ids should be the same',fluReport.id, report.id);
+			assertTrue('ids should not match', 7 != report.id);
+			assertNotUndefined('should not be undefined', fluReportManager.findReportById(3) );
 		}
 	}
 }
