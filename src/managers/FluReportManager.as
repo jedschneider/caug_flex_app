@@ -46,7 +46,7 @@ package managers
 		public function stringToDate(s:String):Date
 		{
 			var year:Number = Number( s.substr(0,4) );
-			var month:Number = Number( s.substr(5,2) );
+			var month:Number = Number( s.substr(5,2) )-1;
 			var day:Number = Number( s.substr(8,2) );
 			var d:Date = new Date(year, month, day);
 			
